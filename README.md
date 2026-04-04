@@ -37,14 +37,17 @@ your-org/
 │   │       ├── calendar.py      ← meeting load, 1-on-1s  [coming soon]
 │   │       └── pagerduty.py     ← incidents, MTTR  [coming soon]
 │   └── skills/
-│       ├── press-release/
-│       ├── pr-review/
-│       ├── sprint-retro/
-│       ├── one-on-one/
-│       ├── performance-review/
-│       ├── incident-postmortem/
-│       ├── team-health/
-│       └── hiring-feedback/
+│       ├── product/
+│       │   ├── press-release/
+│       │   └── sprint-retro/
+│       ├── engineering/
+│       │   ├── pr-review/
+│       │   └── incident-postmortem/
+│       └── people/
+│           ├── one-on-one/
+│           ├── performance-review/
+│           ├── team-health/
+│           └── hiring-feedback/
 │
 ├── payments-service/            ← your Java repo
 │   ├── CLAUDE.md                ← product context + env vars
@@ -109,8 +112,8 @@ In each Java (or any) repo you want to use EMA from:
 
 ```bash
 # Copy the skills you need
-cp -r /path/to/ema/skills/press-release  my-repo/skills/
-cp -r /path/to/ema/skills/pr-review      my-repo/skills/
+cp -r /path/to/ema/skills/product/press-release  my-repo/skills/
+cp -r /path/to/ema/skills/engineering/pr-review  my-repo/skills/
 
 # Copy and customise the context file
 cp /path/to/ema/CLAUDE.template.md my-repo/CLAUDE.md
@@ -256,14 +259,17 @@ ema/
 │       ├── calendar.py
 │       └── pagerduty.py
 └── skills/
-    ├── press-release/SKILL.md
-    ├── pr-review/SKILL.md
-    ├── sprint-retro/SKILL.md
-    ├── one-on-one/SKILL.md
-    ├── performance-review/SKILL.md
-    ├── incident-postmortem/SKILL.md
-    ├── team-health/SKILL.md
-    └── hiring-feedback/SKILL.md
+    ├── product/
+    │   ├── press-release/SKILL.md
+    │   └── sprint-retro/SKILL.md
+    ├── engineering/
+    │   ├── pr-review/SKILL.md
+    │   └── incident-postmortem/SKILL.md
+    └── people/
+        ├── one-on-one/SKILL.md
+        ├── performance-review/SKILL.md
+        ├── team-health/SKILL.md
+        └── hiring-feedback/SKILL.md
 ```
 
 ---
