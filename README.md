@@ -1,12 +1,16 @@
-# EMA — Engineering Manager Assistant
-
-> An open-source Claude Code toolkit that gives engineering managers AI-assisted workflows for their most time-consuming recurring tasks.
-
-EMA is a single shared MCP server + a library of skills any team can clone and customise. It connects to GitHub, Jira, Slack, Calendar, and PagerDuty, and can run interactively or as a fully autonomous agent in CI/CD.
+<div align="center">
+<h1 align="center">🎙️ EMA — Engineering Manager Assistant</h1> 
+<h3>An open-source Claude Code toolkit that gives engineering managers AI-assisted workflows for their most time-consuming recurring tasks.</h3>
+<img src="https://img.shields.io/badge/Status-Active-green"> <img src="https://img.shields.io/badge/Coverage-95.04%25-brightgreen"> <img src="https://img.shields.io/badge/Pylint-9.93%2F10-brightgreen">
+<br><br>
+<img src="https://github.com/dimastatz/mindquest/blob/main/docs/imgs/mindquest.png?raw=true" width="256px"> 
+</div>
 
 ---
 
 ## What it does
+EMA is a single shared MCP server + a library of skills any team can clone and customise. It connects to GitHub, Jira, Slack, Calendar, and PagerDuty, and can run interactively or as a fully autonomous agent in CI/CD.
+
 
 | Invoke | What happens |
 |---|---|
