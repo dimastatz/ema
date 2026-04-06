@@ -21,6 +21,19 @@ EMA is a single shared MCP server + a library of skills any team can clone and c
 
 ---
 
+## How To Use
+
+```bash
+curl -s https://raw.githubusercontent.com/your-org/ema/main/install.sh | bash
+
+# Or with a role flag:
+bash install.sh --role em    # engineering manager
+bash install.sh --role se    # software engineer (default)
+
+# Just install globally, skip repo setup:
+bash install.sh --global
+```
+
 ## Architecture
 
 ```
