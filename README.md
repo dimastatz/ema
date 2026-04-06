@@ -3,7 +3,7 @@
 <h3>An open-source Claude Code toolkit that gives engineering managers AI-assisted workflows for their most time-consuming recurring tasks.</h3>
 <img src="https://img.shields.io/badge/Status-Active-green"> <img src="https://img.shields.io/badge/Coverage-95.04%25-brightgreen"> <img src="https://img.shields.io/badge/Pylint-9.93%2F10-brightgreen">
 <br><br>
-<img src="https://github.com/dimastatz/mindquest/blob/main/docs/imgs/mindquest.png?raw=true" width="256px"> 
+<img src="https://github.com/dimastatz/ema/blob/main/docs/imgs/ema.png?raw=true" width="256px"> 
 </div>
 
 ---
