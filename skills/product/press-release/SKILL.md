@@ -1,6 +1,6 @@
 ---
 name: press-release
-description: "Generate press releases for product releases. Use when: writing a release announcement, need to communicate version features to customers."
+description: "Use this skill whenever the user asks to write, generate, draft, create, or prepare a press release, release announcement, product announcement, or launch post for a software version, major release, or product update. Trigger even for casual phrasing: we shipped v5, write the announcement for v4.2.0, make the release post, draft something for the new version. Always call get_release_info via MCP first to ground the output in real commit data, then follow this skill exactly. Do not write a press release from memory — always fetch data first."
 ---
 
 # Press Release
