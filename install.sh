@@ -43,10 +43,17 @@ ROLE="se"
 GLOBAL_ONLY=false
 FORCE_UPDATE=false
 SPECIFIC_SKILLS=""
-EMA_DIR="${HOME}/.ema"
 EMA_REPO="https://github.com/your-org/ema"   # ← set your actual repo URL
 REPO_DIR="$(pwd)"
 UNFILLED=()
+
+# If this script is being run from inside the EMA repo, use it in place
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "$SCRIPT_DIR/mcp/server.py" ]]; then
+  EMA_DIR="$SCRIPT_DIR"
+else
+  EMA_DIR="${HOME}/.ema"
+fi
 
 # ── Arg parsing ──────────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
@@ -70,7 +77,7 @@ done
 echo ""
 echo -e "${BOLD}EMA — Engineering Manager Assistant${RESET}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-printf "  %-14s %s\n" "Role:"    "${ROLE^^}"
+printf "  %-14s %s\n" "Role:"    "$(echo "$ROLE" | tr '[:lower:]' '[:upper:]')"
 printf "  %-14s %s\n" "EMA dir:" "$EMA_DIR"
 [[ -n "$SPECIFIC_SKILLS" ]] && printf "  %-14s %s\n" "Skills:" "$SPECIFIC_SKILLS"
 [[ "$GLOBAL_ONLY" == false ]] && printf "  %-14s %s\n" "Repo:" "$REPO_DIR"
@@ -96,7 +103,9 @@ fi
 # =============================================================================
 header "Step 2 — EMA repository"
 
-if [[ -d "$EMA_DIR/.git" ]]; then
+if [[ "$SCRIPT_DIR" == "$EMA_DIR" ]]; then
+  success "Using local EMA repo at $EMA_DIR"
+elif [[ -d "$EMA_DIR/.git" ]]; then
   if [[ "$FORCE_UPDATE" == true ]]; then
     info "Pulling latest EMA..."
     git -C "$EMA_DIR" pull --quiet
@@ -209,12 +218,12 @@ if claude mcp list 2>/dev/null | grep -q "^ema"; then
   if [[ "$FORCE_UPDATE" == true ]]; then
     info "Re-registering MCP server (--update)..."
     claude mcp remove ema 2>/dev/null || true
-    claude mcp add ema --command "$PYTHON_BIN" --args "$MCP_SERVER"
+    claude mcp add ema -- "$PYTHON_BIN" "$MCP_SERVER"
     success "MCP server re-registered"
   fi
 else
   info "Registering EMA MCP server globally..."
-  claude mcp add ema --command "$PYTHON_BIN" --args "$MCP_SERVER"
+  claude mcp add -s user ema -- "$PYTHON_BIN" "$MCP_SERVER"
   claude mcp list 2>/dev/null | grep -q "^ema" \
     && success "EMA MCP server registered" \
     || warn "Registration may not have taken effect — run 'claude mcp list' to verify"
@@ -234,7 +243,7 @@ if [[ "$GLOBAL_ONLY" == true ]]; then
   exit 0
 fi
 
-header "Step 6 — Repo setup (${ROLE^^})"
+header "Step 6 — Repo setup ($(echo "$ROLE" | tr '[:lower:]' '[:upper:]'))"
 
 git -C "$REPO_DIR" rev-parse --git-dir &>/dev/null \
   || die "$REPO_DIR is not a git repository. cd into your repo first."
@@ -262,6 +271,21 @@ copy_skill() {
   fi
 }
 
+# ── Resolve which category dirs to copy based on role ─────────────────────────
+# Skills are organized by domain: product/, engineering/, people/
+# em  → product + engineering + people
+# se  → engineering
+# both → product + engineering + people
+em_categories="product engineering people"
+se_categories="engineering"
+
+resolve_categories() {
+  case "$1" in
+    em|both) echo "$em_categories" ;;
+    se)      echo "$se_categories" ;;
+  esac
+}
+
 # ── Copy skills ───────────────────────────────────────────────────────────────
 if [[ -n "$SPECIFIC_SKILLS" ]]; then
   info "Cherry-picking skills: $SPECIFIC_SKILLS"
@@ -269,24 +293,20 @@ if [[ -n "$SPECIFIC_SKILLS" ]]; then
   for skill in "${SKILL_LIST[@]}"; do
     skill=$(echo "$skill" | tr -d ' ')
     found=false
-    for dir in em se shared; do
+    for dir in product engineering people; do
       if [[ -d "$EMA_DIR/skills/$dir/$skill" ]]; then
         copy_skill "$skill" "$EMA_DIR/skills/$dir"
         found=true
         break
       fi
     done
-    [[ "$found" == false ]] && warn "Skill '$skill' not found in em/, se/, or shared/"
+    [[ "$found" == false ]] && warn "Skill '$skill' not found in product/, engineering/, or people/"
   done
 else
-  ROLE_DIRS=()
-  [[ "$ROLE" == "em"   || "$ROLE" == "both" ]] && ROLE_DIRS+=("em")
-  [[ "$ROLE" == "se"   || "$ROLE" == "both" ]] && ROLE_DIRS+=("se")
-
-  for role_dir in "${ROLE_DIRS[@]}"; do
-    SRC="$EMA_DIR/skills/$role_dir"
+  for category in $(resolve_categories "$ROLE"); do
+    SRC="$EMA_DIR/skills/$category"
     if [[ -d "$SRC" ]]; then
-      info "Copying ${role_dir^^} skills..."
+      info "Copying $category skills..."
       for skill_path in "$SRC"/*/; do
         [[ -d "$skill_path" ]] && copy_skill "$(basename "$skill_path")" "$SRC"
       done
@@ -294,14 +314,6 @@ else
       warn "No skills directory at $SRC"
     fi
   done
-
-  SHARED="$EMA_DIR/skills/shared"
-  if [[ -d "$SHARED" ]]; then
-    info "Copying shared skills..."
-    for skill_path in "$SHARED"/*/; do
-      [[ -d "$skill_path" ]] && copy_skill "$(basename "$skill_path")" "$SHARED"
-    done
-  fi
 fi
 
 # ── CLAUDE.md ────────────────────────────────────────────────────────────────
@@ -360,7 +372,7 @@ echo ""
 echo -e "  ${BOLD}Then start:${RESET}"
 echo    "    cd $REPO_DIR && claude"
 echo ""
-echo -e "  ${BOLD}Example prompts (${ROLE^^}):${RESET}"
+echo -e "  ${BOLD}Example prompts ($(echo "$ROLE" | tr '[:lower:]' '[:upper:]')):${RESET}"
 if [[ "$ROLE" == "em" || "$ROLE" == "both" ]]; then
   echo '    "write the press release for v4.2.0"'
   echo '    "review this PR: https://github.com/org/repo/pull/42"'
